@@ -1,0 +1,6 @@
+[requires]
+boost/1.71.0@conan/stable
+yaml-cpp/0.6.2@bincrafters/stable
+
+[generators]
+cmake
