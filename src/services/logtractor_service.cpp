@@ -3,10 +3,53 @@
 //
 
 #include "logtractor_service.hpp"
+#include "../sources/source_udp.hpp"
+#include "../appenders/appender_file.hpp"
 
-void LogtractorService::initSources() {
+#include <exception>
+
+void LogtractorService::init() {
+	for (auto &&[appenderName, appender] : config.appenders) {
+		if (appender.type == "file") {
+			auto appConf = std::get<AppenderFileConfig>(appender.config);
+
+			appenders.insert({appenderName, std::make_shared<AppenderFile>(appConf.filename)});
+
+			logger.info("Added appender '", appenderName, "' with type '", appender.type, "'");
+		} else {
+			logger.error("Unknown appender type: '", appender.type, "'");
+			throw std::runtime_error("Unknown appender type");
+		}
+	}
+
 	for (auto &&[sourceName, source] : config.sources) {
+		if (source.type == "udp") {
+			auto srcConf = std::get<SourceUdpConfig>(source.config);
 
-		logger.info("Added source '", sourceName, "'");
+			for (auto &&appenderName : srcConf.appenders) {
+				if (appenders.find(appenderName) == appenders.end()) {
+					logger.error("Unknown appender '", appenderName, "' for source '", sourceName, "'");
+					throw std::runtime_error("Unknown appender");
+				}
+			}
+
+			auto sourceObj = std::make_shared<SourceUdp>(io, srcConf.address, srcConf.port,
+				[this, srcConf] (const std::shared_ptr<std::string> &message) {
+					for (auto &&appenderName : srcConf.appenders) {
+						auto &appender = *appenders[appenderName];
+						appender.processMessage(message);
+					}
+				}
+			);
+
+			sourceObj->startReceive();
+
+			sources.insert({sourceName, std::move(sourceObj)});
+
+			logger.info("Added source '", sourceName, "' with type '", source.type, "'");
+		} else {
+			logger.error("Unknown source type: '", source.type, "'");
+			throw std::runtime_error("Unknown source type");
+		}
 	}
 }
