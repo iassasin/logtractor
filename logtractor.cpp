@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
 	Logger logger;
 
 	try {
+		// TODO: replace boost::program_options with something else, it's x2 binary size (500k -> 1M)
 		po::variables_map vm;
 
 		po::options_description optionsDescription("Options");
