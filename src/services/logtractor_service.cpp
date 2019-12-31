@@ -13,7 +13,7 @@ void LogtractorService::init() {
 		if (appender.type == "file") {
 			auto appConf = std::get<AppenderFileConfig>(appender.config);
 
-			appenders.insert({appenderName, std::make_shared<AppenderFile>(appConf.filename)});
+			appenders.insert({appenderName, std::make_shared<AppenderFile>(io, appConf.filename, logger)});
 
 			logger.info("Added appender '", appenderName, "' with type '", appender.type, "'");
 		} else {
@@ -33,7 +33,7 @@ void LogtractorService::init() {
 				}
 			}
 
-			auto sourceObj = std::make_shared<SourceUdp>(io, srcConf.address, srcConf.port,
+			auto sourceObj = std::make_shared<SourceUdp>(io, srcConf.address, srcConf.port, logger,
 				[this, srcConf] (const std::shared_ptr<std::string> &message) {
 					for (auto &&appenderName : srcConf.appenders) {
 						auto &appender = *appenders[appenderName];
