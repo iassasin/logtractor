@@ -1,19 +1,38 @@
 #include <string>
+#include <iostream>
 
 #include <boost/asio.hpp>
 #include <boost/di.hpp>
+#include <boost/program_options.hpp>
 
 #include "src/config.hpp"
 #include "src/services/logtractor_service.hpp"
 #include "src/logger.hpp"
 
 namespace di = boost::di;
+namespace po = boost::program_options;
 
-int main() {
+int main(int argc, char **argv) {
 	Logger logger;
 
 	try {
-		auto config = loadConfig("./logtractor.yml");
+		po::variables_map vm;
+
+		po::options_description optionsDescription("Options");
+		optionsDescription.add_options()
+				("help,h", "print this message")
+				("config", po::value<std::string>()->default_value("logtractor.yml"), "set config file");
+
+		po::store(po::parse_command_line(argc, argv, optionsDescription), vm);
+		po::notify(vm);
+
+		if (vm.count("help")) {
+			std::cout << "logtractor [options]\n" << std::endl;
+			std::cout << optionsDescription << std::endl;
+			return 0;
+		}
+
+		auto config = loadConfig(vm["config"].as<std::string>());
 
 		boost::asio::io_context io_context;
 
@@ -29,6 +48,7 @@ int main() {
 		io_context.run();
 	} catch (std::exception &e) {
 		logger.error("Fatal error: ", e);
+		return 1;
 	}
 
 	return 0;
