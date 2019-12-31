@@ -1,0 +1,11 @@
+appenders:
+  testapp:
+    type: file
+    filename: test.log
+
+sources:
+  testport:
+    type: udp
+    address: "::"
+    port: 32001
+    appenders: [testapp]
