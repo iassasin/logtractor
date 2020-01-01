@@ -20,7 +20,7 @@ private:
 	Logger &logger;
 
 	boost::asio::posix::stream_descriptor file;
-	std::queue<std::shared_ptr<std::string>> writeQueue;
+	std::queue<std::shared_ptr<Message>> writeQueue;
 	bool writeInProgress;
 
 	void processWrite();
@@ -38,7 +38,7 @@ public:
 		file.assign(fd);
 	}
 
-	void processMessage(std::shared_ptr<std::string> message) override;
+	void processMessage(std::shared_ptr<Message> message) override;
 };
 
 

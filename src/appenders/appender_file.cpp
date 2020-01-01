@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-void AppenderFile::processMessage(std::shared_ptr<std::string> message) {
+void AppenderFile::processMessage(std::shared_ptr<Message> message) {
 	writeQueue.push(message);
 
 	if (!writeInProgress) {
@@ -19,14 +19,18 @@ void AppenderFile::processWrite() {
 	auto msg = writeQueue.front();
 	writeQueue.pop();
 
-	boost::asio::async_write(file, boost::asio::buffer(*msg),
+	auto &strMsg = msg->as<std::string>();
+
+	boost::asio::async_write(file, boost::asio::buffer(strMsg),
 		[this, ptr = shared_from_this(), msg] (const boost::system::error_code &error, std::size_t bytesWritten) {
+			auto &strMsg = msg->as<std::string>();
+
 			if (error) {
-				logger.error("[AppenderFile] Error: ", error, ". For message: ", *msg);
+				logger.error("[AppenderFile] Error: ", error, ". For message: ", strMsg);
 			}
 
-			if (bytesWritten != msg->size()) {
-				logger.warn("[AppenderFile] Written ", bytesWritten, " / ", msg->size(), " bytes");
+			if (bytesWritten != strMsg.size()) {
+				logger.warn("[AppenderFile] Written ", bytesWritten, " / ", strMsg.size(), " bytes");
 			}
 
 			if (!writeQueue.empty()) {

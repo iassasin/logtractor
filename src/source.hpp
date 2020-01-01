@@ -5,12 +5,14 @@
 #ifndef LOGTRACTOR_SOURCE_HPP
 #define LOGTRACTOR_SOURCE_HPP
 
+#include "message.hpp"
+
 #include <memory>
 #include <functional>
 
 class Source : public std::enable_shared_from_this<Source> {
 protected:
-	std::function<void(std::shared_ptr<std::string>)> callback;
+	std::function<void(std::shared_ptr<Message>)> callback;
 
 	explicit Source(decltype(callback) &&cbk) : enable_shared_from_this(), callback(std::move(cbk)) {}
 public:

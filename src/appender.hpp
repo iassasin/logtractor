@@ -5,6 +5,8 @@
 #ifndef LOGTRACTOR_APPENDER_HPP
 #define LOGTRACTOR_APPENDER_HPP
 
+#include "message.hpp"
+
 #include <string>
 #include <memory>
 #include <functional>
@@ -14,7 +16,7 @@ protected:
 
 public:
 	virtual ~Appender() = default;
-	virtual void processMessage(std::shared_ptr<std::string> message) = 0;
+	virtual void processMessage(std::shared_ptr<Message> message) = 0;
 };
 
 

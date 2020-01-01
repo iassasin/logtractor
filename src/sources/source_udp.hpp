@@ -34,7 +34,7 @@ public:
 		socket.async_receive_from(boost::asio::buffer(recv_buffer), remote_endpoint,
 			[this, ptr = shared_from_this()](const boost::system::error_code &error, std::size_t bytesTransferred) {
 				if (!error) {
-					auto message = std::make_shared<std::string>(recv_buffer.data(), bytesTransferred);
+					auto message = std::make_shared<Message>(std::move(std::string(recv_buffer.data(), bytesTransferred)));
 					callback(std::move(message));
 				} else {
 					logger.error("Error reading message from [", remote_endpoint, "] - ", error);

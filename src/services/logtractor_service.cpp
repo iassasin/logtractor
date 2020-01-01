@@ -34,7 +34,7 @@ void LogtractorService::init() {
 			}
 
 			auto sourceObj = std::make_shared<SourceUdp>(io, srcConf.address, srcConf.port, logger,
-				[this, srcConf] (const std::shared_ptr<std::string> &message) {
+				[this, srcConf] (const std::shared_ptr<Message> &message) {
 					for (auto &&appenderName : srcConf.appenders) {
 						auto &appender = *appenders[appenderName];
 						appender.processMessage(message);
