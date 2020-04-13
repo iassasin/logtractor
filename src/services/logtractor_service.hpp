@@ -31,6 +31,7 @@ public:
 	}
 
 	void init();
+	void reinit();
 };
 
 

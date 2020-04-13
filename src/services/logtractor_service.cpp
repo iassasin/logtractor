@@ -53,3 +53,13 @@ void LogtractorService::init() {
 		}
 	}
 }
+
+void LogtractorService::reinit() {
+	for (auto &[_, source] : sources) {
+		source->stopReceive();
+	}
+
+	appenders.clear();
+	sources.clear();
+	init();
+}

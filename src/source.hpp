@@ -18,6 +18,7 @@ protected:
 public:
 	virtual ~Source() = default;
 	virtual void startReceive() = 0;
+	virtual void stopReceive() = 0;
 };
 
 
