@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 project(logtractor)
 
-add_definitions("-std=c++2a")
+add_definitions("-std=c++20")
 
 include(build/conanbuildinfo.cmake)
 conan_basic_setup()
